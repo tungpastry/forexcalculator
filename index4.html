@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forex Trade Calculator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Arial', sans-serif;
+            background: url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+
+        .container {
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 30px auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #ddd;
+            font-size: 18px;
+        }
+
+        input, select {
+            padding: 14px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 18px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 40px;
+            padding: 25px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 8px;
+            font-size: 24px; /* Font gấp 1.5 lần bình thường */
+            line-height: 1.8; /* Tăng khoảng cách giữa các dòng */
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .result-item span {
+            color: #ccc;
+        }
+
+        .result-item strong {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        h2 {
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            font-size: 26px;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Forex Trade Calculator</h1>
+        
+        <form id="tradeForm">
+            <div class="form-group">
+                <label for="currencyPair">Cặp tiền giao dịch:</label>
+                <select id="currencyPair" required>
+                    <option value="EURUSD">EUR/USD</option>
+                    <option value="GBPUSD">GBP/USD</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="tradeType">Loại lệnh:</label>
+                <select id="tradeType" required>
+                    <option value="long">Long (Mua)</option>
+                    <option value="short">Short (Bán)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="entryPrice">Giá Entry:</label>
+                <input type="number" id="entryPrice" step="0.0001" required>
+            </div>
+
+            <div class="form-group">
+                <label for="stopLoss">Giá Stop Loss:</label>
+                <input type="number" id="stopLoss" step="0.0001" required>
+            </div>
+
+            <div class="form-group">
+                <label for="takeProfit">Giá Take Profit:</label>
+                <input type="number" id="takeProfit" step="0.0001" required>
+            </div>
+
+            <div class="form-group">
+                <label for="lotSize">Khối lượng (Lot):</label>
+                <input type="number" id="lotSize" step="0.01" required>
+            </div>
+
+            <button type="button" onclick="calculateTrade()">TÍNH TOÁN</button>
+        </form>
+
+        <div id="result" style="display: none;">
+            <h2>KẾT QUẢ GIAO DỊCH</h2>
+            <div class="result-item">
+                <span>Tỉ lệ Risk/Reward:</span>
+                <strong id="riskReward">-</strong>
+            </div>
+            <div class="result-item">
+                <span>Số tiền rủi ro:</span>
+                <strong id="riskAmount">-</strong> USD
+            </div>
+            <div class="result-item">
+                <span>Số Pip SL:</span>
+                <strong id="pipSL">-</strong>
+            </div>
+            <div class="result-item">
+                <span>Số tiền lợi nhuận:</span>
+                <strong id="rewardAmount">-</strong> USD
+            </div>
+            <div class="result-item">
+                <span>Số Pip TP:</span>
+                <strong id="pipTP">-</strong>
+            </div>
+            <div class="result-item">
+                <span>Giá trị mỗi Pip:</span>
+                <strong id="pipValue">-</strong> USD
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateTrade() {
+            // Lấy giá trị từ form
+            const currencyPair = document.getElementById('currencyPair').value;
+            const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+            const stopLoss = parseFloat(document.getElementById('stopLoss').value);
+            const takeProfit = parseFloat(document.getElementById('takeProfit').value);
+            const lotSize = parseFloat(document.getElementById('lotSize').value);
+
+            // Tính toán
+            const pipDecimal = 10000;
+            const pipSL = Math.abs(entryPrice - stopLoss) * pipDecimal;
+            const pipTP = Math.abs(takeProfit - entryPrice) * pipDecimal;
+            const pipValue = lotSize * 10;
+            const riskAmount = pipSL * pipValue;
+            const rewardAmount = pipTP * pipValue;
+            const riskRewardRatio = (rewardAmount / riskAmount).toFixed(2);
+
+            // Hiển thị kết quả
+            document.getElementById('riskReward').textContent = riskRewardRatio + ":1";
+            document.getElementById('riskAmount').textContent = riskAmount.toFixed(2);
+            document.getElementById('pipSL').textContent = pipSL.toFixed(1);
+            document.getElementById('rewardAmount').textContent = rewardAmount.toFixed(2);
+            document.getElementById('pipTP').textContent = pipTP.toFixed(1);
+            document.getElementById('pipValue').textContent = pipValue.toFixed(2);
+
+            document.getElementById('result').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
